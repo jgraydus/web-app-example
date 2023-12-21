@@ -10,6 +10,7 @@ common shared-properties
         -O2
     build-depends:
         base < 5.0,
+        text,
         wai,
     default-extensions:
         DataKinds,
@@ -25,9 +26,12 @@ library
     hs-source-dirs:   lib
     build-depends:
         http-types,
+        servant,
+        servant-server,
     exposed-modules:
         Web.Application,
     other-modules:
+        Web.Routes,
 
 executable server
     import: shared-properties

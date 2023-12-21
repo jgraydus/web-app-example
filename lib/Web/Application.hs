@@ -1,8 +1,11 @@
 module Web.Application where
 
-import Network.HTTP.Types.Status (status200)
-import Network.Wai (Application, responseLBS)
+import Servant
+import Web.Routes (WidgetsApi, widgetsApiHandler)
 
 app :: Application
-app req res = res $ responseLBS status200 [] "Hello!"
+app =
+  serve
+    (Proxy :: Proxy WidgetsApi)
+    widgetsApiHandler
 
