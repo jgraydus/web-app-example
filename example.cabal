@@ -14,8 +14,11 @@ common shared-properties
         wai,
     default-extensions:
         DataKinds,
+        DeriveAnyClass,
+        DerivingStrategies,
         LambdaCase,
         NamedFieldPuns,
+        OverloadedRecordDot,
         OverloadedStrings,
         RecordWildCards,
         TupleSections,
@@ -25,6 +28,7 @@ library
     import: shared-properties
     hs-source-dirs:   lib
     build-depends:
+        aeson,
         http-types,
         servant,
         servant-server,
