@@ -1,0 +1,43 @@
+cabal-version:      3.6
+name:               example
+version:            0.1.0.0
+build-type:         Simple
+
+common shared-properties
+    default-language: GHC2021
+    ghc-options:
+        -Wall
+        -O2
+    build-depends:
+        base < 5.0,
+        wai,
+    default-extensions:
+        DataKinds,
+        LambdaCase,
+        NamedFieldPuns,
+        OverloadedStrings,
+        RecordWildCards,
+        TupleSections,
+        UndecidableInstances,
+
+library
+    import: shared-properties
+    hs-source-dirs:   lib
+    build-depends:
+        http-types,
+    exposed-modules:
+        Web.Application,
+    other-modules:
+
+executable server
+    import: shared-properties
+    hs-source-dirs:   app/server
+    main-is:          Main.hs
+    ghc-options:
+        -threaded
+        -rtsopts
+        -with-rtsopts=-N
+    build-depends:
+        example,
+        warp,
+
