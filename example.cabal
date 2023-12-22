@@ -36,6 +36,7 @@ library
     exposed-modules:
         Web.Application,
     other-modules:
+        Widgets,
         Web.RouteHandler,
         Web.Routes,
 

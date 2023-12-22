@@ -3,30 +3,14 @@ module Web.Routes (
   widgetsApiHandler,
 ) where
 
-import Data.Aeson (ToJSON)
-import Data.List (find)
-import Data.Text (Text)
-import GHC.Generics (Generic)
 import Servant
+import Widgets
 import Web.RouteHandler
-
-type WidgetId = Int
-type WidgetName = Text
-
-data Widget = Widget { id :: WidgetId, name :: WidgetName }
-  deriving stock (Generic, Show)
-  deriving anyclass (ToJSON)
 
 type WidgetsApi = GetWidgets :<|> GetWidget
 
 widgetsApiHandler :: RouteHandler WidgetsApi
 widgetsApiHandler = getWidgetsHandler :<|> getWidgetHandler
-
-widgetsDb :: [Widget]
-widgetsDb =
-  [ Widget { id = 42, name = "Large Widget" }
-  , Widget { id = 17, name = "Small Widget" }
-  ]
 
 --------------------------------------------------
 -- GET /widget
@@ -34,7 +18,7 @@ widgetsDb =
 type GetWidgets = "widget" :> Get '[JSON] [Widget]
 
 getWidgetsHandler :: RouteHandler GetWidgets
-getWidgetsHandler = pure widgetsDb
+getWidgetsHandler = getWidgets
 
 --------------------------------------------------
 -- GET /widget/:widgetId
@@ -42,8 +26,9 @@ getWidgetsHandler = pure widgetsDb
 type GetWidget = "widget" :> Capture "widgetId" WidgetId :> Get '[JSON] Widget
 
 getWidgetHandler :: RouteHandler GetWidget
-getWidgetHandler widgetId =
-   case find (\widget -> widget.id == widgetId)  widgetsDb of
+getWidgetHandler widgetId = do
+   result <- getWidget widgetId
+   case result of
      Just widget -> pure widget
      Nothing -> throwError err404
 
