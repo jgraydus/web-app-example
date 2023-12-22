@@ -8,6 +8,7 @@ import Data.List (find)
 import Data.Text (Text)
 import GHC.Generics (Generic)
 import Servant
+import Web.RouteHandler
 
 type WidgetId = Int
 type WidgetName = Text
@@ -18,7 +19,7 @@ data Widget = Widget { id :: WidgetId, name :: WidgetName }
 
 type WidgetsApi = GetWidgets :<|> GetWidget
 
-widgetsApiHandler :: Server WidgetsApi
+widgetsApiHandler :: RouteHandler WidgetsApi
 widgetsApiHandler = getWidgetsHandler :<|> getWidgetHandler
 
 widgetsDb :: [Widget]
@@ -32,7 +33,7 @@ widgetsDb =
 
 type GetWidgets = "widget" :> Get '[JSON] [Widget]
 
-getWidgetsHandler :: Server GetWidgets
+getWidgetsHandler :: RouteHandler GetWidgets
 getWidgetsHandler = pure widgetsDb
 
 --------------------------------------------------
@@ -40,7 +41,7 @@ getWidgetsHandler = pure widgetsDb
 
 type GetWidget = "widget" :> Capture "widgetId" WidgetId :> Get '[JSON] Widget
 
-getWidgetHandler :: Server GetWidget
+getWidgetHandler :: RouteHandler GetWidget
 getWidgetHandler widgetId =
    case find (\widget -> widget.id == widgetId)  widgetsDb of
      Just widget -> pure widget
