@@ -11,6 +11,7 @@ common shared-properties
     build-depends:
         base < 5.0,
         mtl,
+        stm,
         text,
         wai,
     default-extensions:
@@ -34,9 +35,10 @@ library
         servant,
         servant-server,
     exposed-modules:
+        Widgets,
         Web.Application,
     other-modules:
-        Widgets,
+        Web.RequestContext,
         Web.RouteHandler,
         Web.Routes,
 

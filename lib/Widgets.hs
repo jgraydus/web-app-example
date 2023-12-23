@@ -1,9 +1,14 @@
 module Widgets where
 
+import Control.Concurrent.STM.TVar (readTVar, TVar)
+import Control.Concurrent.STM (atomically)
+import Control.Monad.IO.Class (liftIO, MonadIO)
+import Control.Monad.Reader (asks, MonadReader)
 import Data.Aeson (ToJSON)
 import Data.List (find)
 import Data.Text (Text)
 import GHC.Generics (Generic)
+import GHC.Records (getField, HasField)
 
 type WidgetId = Int
 type WidgetName = Text
@@ -19,13 +24,18 @@ class Monad m => WidgetService m where
   getWidgets :: m [Widget]
   getWidget :: WidgetId -> m (Maybe Widget)
 
-widgetsDb :: [Widget]
-widgetsDb =
-  [ Widget { id = 42, name = "Large Widget" }
-  , Widget { id = 17, name = "Small Widget" }
-  ]
+instance
+  ( Monad m
+  , MonadIO m
+  , MonadReader r m
+  , HasField "widgetsDb" r (TVar [Widget])
+  ) => WidgetService m where
 
-instance Monad m => WidgetService m where
-  getWidgets = pure widgetsDb
-  getWidget widgetId = pure $ find (\widget -> widget.id == widgetId) widgetsDb
+  getWidgets = do
+    widgetsDb <- asks (getField @"widgetsDb")
+    liftIO $ atomically $ readTVar widgetsDb
+
+  getWidget widgetId = do
+    widgets <- getWidgets
+    pure $ find (\widget -> widget.id == widgetId) widgets
 

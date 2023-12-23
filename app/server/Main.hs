@@ -1,9 +1,11 @@
 module Main where
 
 import Network.Wai.Handler.Warp (run)
-import Web.Application (app)
+import Web.Application (newApp)
 
 main :: IO ()
-main = run port app
-  where port = 8000
+main = do
+  let port = 8000
+  app <- newApp
+  run port app
 
