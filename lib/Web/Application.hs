@@ -26,9 +26,6 @@ app widgetsDb req res = do
 
 newApp :: IO Application
 newApp = do
-  widgetsDb <- newTVarIO
-    [ Widget { id = 42, name = "Large Widget" }
-    , Widget { id = 17, name = "Small Widget" }
-    ]
+  widgetsDb <- newTVarIO []
   pure $ app widgetsDb
 

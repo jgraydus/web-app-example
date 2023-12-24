@@ -1,6 +1,6 @@
 module Widgets where
 
-import Control.Concurrent.STM.TVar (readTVar, TVar)
+import Control.Concurrent.STM.TVar (modifyTVar', readTVar, TVar, writeTVar)
 import Control.Concurrent.STM (atomically)
 import Control.Monad.IO.Class (liftIO, MonadIO)
 import Control.Monad.Reader (asks, MonadReader)
@@ -23,6 +23,9 @@ data Widget = Widget
 class Monad m => WidgetService m where
   getWidgets :: m [Widget]
   getWidget :: WidgetId -> m (Maybe Widget)
+  createWidget :: WidgetName -> m Widget
+  updateWidget :: WidgetId -> WidgetName -> m (Maybe Widget)
+  deleteWidget :: WidgetId -> m ()
 
 instance
   ( Monad m
@@ -38,4 +41,34 @@ instance
   getWidget widgetId = do
     widgets <- getWidgets
     pure $ find (\widget -> widget.id == widgetId) widgets
+
+  createWidget widgetName = do
+    widgetsDb <- asks (getField @"widgetsDb")
+    liftIO $ atomically $ do
+      widgets <- readTVar widgetsDb
+      let nextId =
+            if null widgets
+            then 0
+            else 1 + maximum (fmap (\widget -> widget.id) widgets)
+          newWidget = Widget { id = nextId, name = widgetName }
+      writeTVar widgetsDb (newWidget : widgets)
+      pure newWidget
+
+  updateWidget widgetId widgetName = do
+    widgetsDb <- asks (getField @"widgetsDb")
+    liftIO $ atomically $ do
+      widgets <- readTVar widgetsDb
+      case find (\widget -> widget.id == widgetId) widgets of
+        Nothing -> pure Nothing
+        Just widget -> do
+          let updatedWidget = widget { name = widgetName }
+          writeTVar widgetsDb
+            (updatedWidget :
+              (filter (\widget -> widget.id /= widgetId) widgets))
+          pure $ Just updatedWidget
+
+  deleteWidget widgetId = do
+    widgetsDb <- asks (getField @"widgetsDb")
+    liftIO $ atomically $
+      modifyTVar' widgetsDb (filter (\widget -> widget.id /= widgetId))
 
