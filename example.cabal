@@ -20,6 +20,7 @@ common shared-properties
         DerivingStrategies,
         DuplicateRecordFields,
         LambdaCase,
+        MonoLocalBinds,
         NamedFieldPuns,
         OverloadedRecordDot,
         OverloadedStrings,
@@ -32,13 +33,15 @@ library
     hs-source-dirs:   lib
     build-depends:
         aeson,
+        fast-logger,
         http-types,
         servant,
         servant-server,
     exposed-modules:
-        Widgets,
+        Logger,
         Web.Application,
     other-modules:
+        Widgets,
         Web.RequestContext,
         Web.RouteHandler,
         Web.Routes,
