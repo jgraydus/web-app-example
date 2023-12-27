@@ -4,6 +4,7 @@ module Logger (
   LogLevel(..),
   toLogStr,
   withLogger,
+  withPrefix,
 ) where
 
 import Control.Exception (bracket)
@@ -41,6 +42,11 @@ withLogger :: LogLevel -> (Logger -> IO a) -> IO a
 withLogger logLevel program = do
   (logger, cleanup) <- newLogger logLevel
   bracket (pure logger) (const cleanup) program
+
+withPrefix :: LogStr -> Logger -> Logger
+withPrefix prefix (Logger { runLogger }) =
+  let runLogger' logLevel logStr = runLogger logLevel (prefix <> logStr)
+  in Logger runLogger'
 
 instance
   ( Monad m

@@ -33,10 +33,12 @@ library
     hs-source-dirs:   lib
     build-depends:
         aeson,
+        clock,
         fast-logger,
         http-types,
         servant,
         servant-server,
+        uuid,
     exposed-modules:
         Logger,
         Web.Application,
